@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>添加面要素</title>
+  <title>添加动态点要素</title>
   <link rel="stylesheet" href="../../dist/hmap.css">
   <style type="text/css">
     html, body, #map {
@@ -43,12 +43,9 @@
 <body>
 <div id="map">
   <div class="menu">
-    <button class="base-button" id="addFeature">添加单面</button>
-    <button class="base-button" id="addFeatures">添加多面</button>
-    <button class="base-button" id="removeFeatureByLayerName">通过layerName移除面</button>
-    <button class="base-button" id="removeFeatureById">通过id移除面</button>
-    <button class="base-button" id="highLightFeatureById">通过id高亮面</button>
-    <button class="base-button" id="unHighLightFeatureById">通过id取消高亮面</button>
+    <button class="base-button" id="addPoint">添加单点</button>
+    <button class="base-button" id="addPoints">添加多点</button>
+    <button class="base-button" id="removePointByLayerName">通过layerName移除点</button>
   </div>
 </div>
 <script src="../../dist/hmap.js"></script>
@@ -64,6 +61,7 @@
         center: [113.53450137499999, 34.44104525],
         projection: 'EPSG:4326',
         zoom: 5, // resolution
+        maxZoom: 17
       },
       baseLayers: [
         {
@@ -74,16 +72,17 @@
         }
       ]
     });
-    var polygons = []
+    var points = []
     Map.on('loadMapSuccess', function (event) {
+      console.log(event)
       if (event) {
         $.ajax({
-          url: '../assets/json/polygons.json',
+          url: '../assets/json/points.json',
           type: 'GET',
           dataType: 'json',
           // 如果请求成功时执行回调
           success: function (res) {
-            polygons = res['data']['features']
+            points = res['data']['features']
           },
           // 如果请求失败时执行回调
           error: function (error) {
@@ -92,18 +91,11 @@
         })
       }
     });
-    $('#addFeature').on('click', function () {
-      Map.addPolygon(polygons[0], {
-        layerName: 'polygon',
+    $('#addPoint').on('click', function () {
+      Map.addPoint(points[0], {
+        layerName: 'point',
         zoomToExtent: true,
         style: {
-          stroke: {
-            strokeColor: '#1b9de8',
-            strokeWidth: 3
-          },
-          fill: {
-            fillColor: 'rgba(27, 157, 232, 0.2)'
-          },
           image: {
             type: 'icon',
             image: {
@@ -113,13 +105,21 @@
           }
         },
         selectStyle: {
-          stroke: {
-            strokeColor: '#D81E06',
-            strokeWidth: 3
-          },
-          fill: {
-            fillColor: 'rgba(27, 157, 232, 0.2)'
-          },
+          image: {
+            type: 'icon',
+            image: {
+              imageSrc: '../assets/images/point2o.png',
+              imageAnchor: [0.5, 1]
+            }
+          }
+        }
+      })
+    });
+    $('#addPoints').on('click', function () {
+      Map.addPoints(points, {
+        layerName: 'points',
+        zoomToExtent: true,
+        style: {
           image: {
             type: 'icon',
             image: {
@@ -129,42 +129,6 @@
           }
         }
       })
-    });
-    $('#addFeatures').on('click', function () {
-      Map.addPolygons(polygons, {
-        layerName: 'polygons',
-        zoomToExtent: true,
-        style: {
-          stroke: {
-            strokeColor: '#1b9de8',
-            strokeWidth: 3
-          },
-          fill: {
-            fillColor: 'rgba(27, 157, 232, 0.2)'
-          }
-        },
-        selectStyle: {
-          stroke: {
-            strokeColor: '#D81E06',
-            strokeWidth: 3
-          },
-          fill: {
-            fillColor: 'rgba(27, 157, 232, 0.2)'
-          }
-        }
-      })
-    });
-    $('#removeFeatureByLayerName').on('click', function () {
-      Map.removeFeatureByLayerName('polygons')
-    });
-    $('#removeFeatureById').on('click', function () {
-      Map.removeFeatureById('1')
-    });
-    $('#highLightFeatureById').on('click', function () {
-      Map.highLightFeature('1')
-    });
-    $('#unHighLightFeatureById').on('click', function () {
-      Map.unHighLightFeature('1')
     });
   })
 </script>
